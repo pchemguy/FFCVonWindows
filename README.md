@@ -185,9 +185,9 @@ This repository automates the entire setup:
 2. It then calls `conda_far.bat` (in `/preactivate` mode) and `libs.bat` (in `/activate` mode), which in turn call the individual `*/activate.bat` scripts.
 3. These scripts _prepend_ the correct paths for **pthreads**, **OpenCV**, and **LibJPEG-Turbo** to the `INCLUDE`, `LIB`, `LINK`, and `PATH` variables.
 4. Finally, `Anaconda.bat` calls Micromamba to bootstrap a minimal Conda environment and then Mamba, which imports the full environment specification leading to  `pip install ffcv fastxtend` at the very end, which inherits this preconfigured environment, allowing the build to succeed without modification.
-It is important to highlight that one of the dependencies, is part of the same environment file as `FFCV`. This approach works, because Conda/Mamba managers install Conda packages first before invoking `pip`/`uv`.
+It is important to highlight that one of the dependencies is part of the same environment file as `FFCV`. This approach works, because Conda/Mamba managers install Conda packages first before invoking `pip`/`uv`.
 
-This project uses a mix of externally downloaded libraries and one Conda-provided library. This hybrid approach was chosen to match FFCV's requirements while minimizing conflicts.
+This project uses a mix of externally downloaded libraries and one Conda-provided library. This hybrid approach was chosen based on clues provided the the project.
 
 | **Library**        | **Version**  | **Source**              | **Integration**                |
 | ------------------ | ------------ | ----------------------- | ------------------------------ |
@@ -217,7 +217,7 @@ When an installation fails, the error message often falls into one of four categ
 
 #### 1. `setup.py` / `pip` Errors
 
-This is an error from the build _frontend_ (pip or setuptools) before the compiler is even invoked. It often means the `setup.py` script itself has failed. The `ffcv` `setup.py` script fails this way if it can not find OpenCV, as its custom `pkgconfig_windows` function raises an exception.
+This is an error from the build _frontend_ (pip or setuptools) before the compiler is even invoked. It often means the `setup.py` script itself has failed. The `ffcv` `setup.py` script fails this way if it can not find its dependencies, as its custom `pkgconfig_windows` function raises an exception.
 
 **Solution:** This error is specific to the package. For `ffcv`, this error is bypassed because the scripts ( `libs.bat`, `opencv/activate.bat`) correctly set the `PATH` environment variables _before_ `pip` runs, which satisfies the `setup.py` script's checks.
 
@@ -233,11 +233,11 @@ This is a failure from `cl.exe` (the C/C++ compiler). These errors are often due
 
 This is a failure from `link.exe` (the linker). This means the linker was told to find a function (an "external symbol") but could not find it in any of the `.lib` files it was given. This indicates a missing or incorrect `*.lib` file. The error message is usually a list of "unresolved external symbols," which provide clues about which dependency is missing.
 
-**Solution:** The `tj...` symbols point to **LibJPEG-Turbo**. This error means that either the `lib` directory containing `turbojpeg.lib` was not added to the `LIB` variable, or `turbojpeg.lib` itself was not added to the `LINK` variable.
+**Solution:** The `tj...` symbols point to **LibJPEG-Turbo**. This error likely means that either the `lib` directory containing `turbojpeg.lib` was not added to the `LIB` variable, or `turbojpeg.lib` itself was not added to the `LINK` variable.
 
 #### 4. The "DLL load failed" Runtime Error
 
-This is the most difficult error to debug. It occurs _after_ the package has successfully compiled and installed, but fails when you try to `import` it in Python.
+This is the most difficult error to debug. It occurs _after_ the package has been successfully compiled and installed, but fails when you try to `import` it in Python.
 
 ![](./AIFFCV/Screenshots/DLLL_Load_Error.jpg)
 
@@ -245,10 +245,10 @@ This error message is deeply misleading. It does not necessarily mean that `_lib
 
 1. **The module is not found:** The file (`_libffcv*.pyd`) is actually missing. (This is rare if `pip install` reported success).
 2. **A direct dependency is not found:** The file `_libffcv.pyd` _was_ found, but the Windows OS loader could not find a DLL it _depends on_ (e.g., `opencv_world460.dll` or `pthreadVC2.dll`). The loader normally, but not always, checks for these DLLs in the active `PATH`.
-3. **A transitive dependency is not found:** A dependency _of a dependency_ is missing. For example, `opencv_world460.dll` might itself depend on `SomeOtherLibrary.dll`, and if _that_ file is not on the `PATH`, the load will fail with the same error.
+3. **A transitive dependency is not found:** A dependency _of a dependency_ is missing. For example, `opencv_world460.dll` might itself depend on `SomeOtherLibrary.dll`, and if _that_ file is not on the `PATH`, the load will fail, probably, with the same error.
 4. **An incompatible dependency was found:** A dependency _was_ found on the `PATH`, but it is incompatible (e.g., a 32-bit DLL was loaded by a 64-bit Python process, or it was compiled with an incompatible C++ runtime).
 
-This ambiguity is what makes Windows DLL loading issues so difficult to resolve.
+This ambiguity is what makes Windows DLL loading issues difficult to resolve.
 
 #### Diagnosing "DLL load failed" with `Dependencies` and `ProcMon`
 
@@ -298,7 +298,7 @@ The critical observation is _where_ it looks:
 - It checks the main Conda environment directories (`.../Anaconda/Library/bin`, etc.).
 - It checks the system directory (`C:\Windows\System32`).
 
-It completely ignores the external directories we added to the `PATH` (e.g., `.../opencv/build/x64/vc15/bin` and `.../pthreads/dll/x64`).
+It completely ignores the external directories we added to the `PATH` (e.g., `.../opencv/build/x64/vc15/bin` and `.../pthreads/dll/x64`). Because LibJPEG-Turbo conda package is used, Python finds its binary (the only line with result reading `FILE LOCKED WITH`...).
 
 This is intentional. Since Python 3.8, the default DLL search order on Windows was changed to mitigate DLL hijacking vulnerabilities. It no longer uses the standard `PATH` environment variable to resolve _dependencies of extension modules_.
 
