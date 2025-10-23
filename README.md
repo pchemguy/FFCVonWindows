@@ -147,7 +147,7 @@ This is especially confusing when you have _already_ activated the MSVC environm
 
 The problem is that `setuptools` (specifically the `setuptools\_distutils\compilers\C\msvc.py` module) ignores your `PATH`. Instead of checking for `cl.exe`, its `_get_vc_env()` function attempts to "find" MSVC using its own limited logic:
 
-1. It calls `_find_vc2017()`, which looks for `vswhere.exe` in a **hardcoded** `%ProgramFiles(x86)%` path.
+1. It calls `_find_vc2017()`, which looks for `vswhere.exe` in a hardcoded `%ProgramFiles(x86)%` path.
 2. It calls `_find_vc2015()`, which checks a specific registry key (`HKLM\Software\Microsoft\VisualStudio\SxS\VC7`).
 
 If you have MSVC installed in a custom location, are using a portable version, or have simply activated the environment via `vcvarsall.bat` _without_ it being in the default path/registry, these checks will fail. `setuptools` will incorrectly conclude that MSVC is not installed and raise the error, even though it is perfectly available in your shell.
