@@ -172,7 +172,7 @@ This is precisely why `conda_far.bat` (which is called by the main `Anaconda.bat
 set "DISTUTILS_USE_SDK=1"
 ```
 
-This single line forces `pip` and `setuptools` to respect the environment that `msbuild.bat` has prepared, making the native compilation robust and reliable.
+This single line forces `pip` and `setuptools` to respect the environment that `msbuild.bat` has prepared, enabling native compilation.
 
 ### The FFCV-Specific Problem
 
