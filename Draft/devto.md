@@ -13,9 +13,8 @@ canonical_url: "https://github.com/pchemguy/FFCVonWindows"
 
 # 🧠 TL;DR
 
-This repository provides self-contained Windows batch scripts for building and installing [FFCV](https://github.com/libffcv/ffcv) and [Fastxtend](https://github.com/warner-benjamin/fastxtend) with full native support.  
-The process reconstructs the missing dependency setup logic and activates the correct MSVC toolchain, while using Micromamba to ensure a fully reproducible Python environment bootstrapping.  
-Beyond automating installation, the scripts serve as a technical deep dive into the subtle challenges of compiling Python packages from source on Windows - including MSVC detection, direct build configuration via environment variables, and runtime DLL resolution.
+This project automates building and installing [FFCV](https://github.com/libffcv/ffcv) on Windows using Micromamba and MSVC - no preinstalled Python required.  
+It also serves as a technical exploration of pip/MSVC integration, dependency resolution, and DLL behavior on Windows.
 
 ---
 
