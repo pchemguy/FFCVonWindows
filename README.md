@@ -23,6 +23,12 @@ The provided scripts:
 
 The environment targets Windows 10+ with ANSI-color-capable terminals (set `NOCOLOR=1` for graceful fallback). Its modular design emphasizes transparency, reproducibility, and debuggability, making it both a practical solution and a learning tool for developers exploring Python’s native build systems on Windows.
 
+More than just a build tool, this repository serves as a technical deep-dive and learning resource for common pip/MSVC build failures on Windows. The repo provides detailed analysis and solutions for:  
+- Diagnosing and resolving failed MS Build Tools detection by `pip`/`setuptools`.
+- Tracing FFCV's build errors to its defective `setup.py` dependency discovery logic.
+- Bypassing broken build configurations by pre-setting `INCLUDE`, `LIB`, and `LINK` environment variables for MSVC toolchain before calling `pip install`.
+- Using `Dependencies` and `ProcMon` to diagnose `ImportError: DLL load failed` and observing Python 3.8+'s secure DLL loading policy in action
+
 ## 💡 Motivation
 
 While FFCV and Fastxtend are potentially powerful tools for high-throughput data loading and fastai integration, their Windows installation workflow has long been underdocumented and partially broken. The original build process lacks proper handling of native dependencies and fails to interface cleanly with the MSVC toolchain.
