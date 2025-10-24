@@ -191,12 +191,12 @@ Rather than modifying upstream code, the scripts predefine correct values via MS
 
 The `activate.bat` scripts configure the environment as follows:
 
-|Variable|pthreads|OpenCV|LibJPEG-Turbo|
-|---|---|---|---|
-|`PATH`|`pthreads\dll\x64`|`opencv\build\x64\vc15\bin`|`Anaconda\Library\bin`|
-|`INCLUDE`|`pthreads\include`|`opencv\build\include`|`Anaconda\Library\include`|
-|`LIB`|`pthreads\lib\x64`|`opencv\build\x64\vc15\lib`|`Anaconda\Library\lib`|
-|`LINK`|`pthreadVC2.lib`|`opencv_world460.lib`|`turbojpeg.lib`|
+| Variable  | pthreads           | OpenCV                      | LibJPEG-Turbo              |
+| --------- | ------------------ | --------------------------- | -------------------------- |
+| PATH    | pthreads\dll\x64 | opencv\build\x64\vc15\bin | Anaconda\Library\bin     |
+| INCLUDE | pthreads\include | opencv\build\include      | Anaconda\Library\include |
+| LIB     | pthreads\lib\x64 | opencv\build\x64\vc15\lib | Anaconda\Library\lib     |
+| LINK    | pthreadVC2.lib   | opencv_world460.lib       | turbojpeg.lib            |
 
 ---
 
