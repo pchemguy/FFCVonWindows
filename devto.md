@@ -120,10 +120,10 @@ Scripts use consistent, minimal ANSI labels (fallback to plain text with `NOCOLO
 
 |File / Directory|Role|
 |---|---|
-|**Anaconda.bat**|Main entry point – orchestrates bootstrap, download, and installation|
-|**conda_far.bat**|Environment activator – prepares MSVC and dependency paths|
-|**msbuild.bat**|MSVC detector and activator|
-|**libs.bat**|Manages native libraries (OpenCV, pthreads, LibJPEG-Turbo)|
+|`Anaconda.bat`|Main entry point – orchestrates bootstrap, download, and installation|
+|`conda_far.bat`|Environment activator – prepares MSVC and dependency paths|
+|`msbuild.bat`|MSVC detector and activator|
+|`libs.bat`|Manages native libraries (OpenCV, pthreads, LibJPEG-Turbo)|
 |`pthreads/activate.bat`|Sets pthreads `PATH`, `LIB`, `INCLUDE`, and `LINK`|
 |`opencv/activate.bat`|Sets OpenCV environment variables|
 |`libjpeg-turbo/activate.bat`|Configures Conda-provided LibJPEG-Turbo|
