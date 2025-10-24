@@ -189,6 +189,8 @@ Rather than modifying upstream code, the scripts predefine correct values via MS
 |pthreads-win32|2.9.1|Sourceware FTP|External|
 |LibJPEG-Turbo|Conda|Internal|Provided by Conda|
 
+The `activate.bat` scripts configure the environment as follows:
+
 |Variable|pthreads|OpenCV|LibJPEG-Turbo|
 |---|---|---|---|
 |`PATH`|`pthreads\dll\x64`|`opencv\build\x64\vc15\bin`|`Anaconda\Library\bin`|
