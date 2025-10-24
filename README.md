@@ -10,6 +10,8 @@ https://gemini.google.com/app/dd501bda3a1d042f
 
 _Self-contained Windows scripts for bootstrapping reproducible, isolated Python environments with natively built FFCV and Fastxtend - using Micromamba and MSVC._
 
+![](https://raw.githubusercontent.com/pchemguy/FFCVonWindows/refs/heads/main/cover.jpg)
+
 ## Summary
 
 This project provides a fully automated Windows build pipeline for the and libraries. It reconstructs missing installation logic for native dependencies and configures a clean, reproducible environment using Micromamba and MS Build Tools - all without requiring a preinstalled Python setup.
