@@ -11,4 +11,3 @@ Sharing this project in case it saves someone else the same frustration when wor
 https://github.com/pchemguy/FFCVonWindows
 
 #Python #Windows #MSVC #FFCV #Scripting
-
