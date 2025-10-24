@@ -5,10 +5,10 @@ https://gemini.google.com/app/b9d7ea94951fc8c3
 
 ---
 title: "Installing FFCV and Fastxtend on Windows with Micromamba and MSVC"
-published: true
+published: false
 description: "A reflective walkthrough of building and installing FFCV and Fastxtend on Windows using self-contained batch scripts, Micromamba, and MSVC."
 tags: [windows, python, msvc, ffcv]
-cover_image: "https://raw.githubusercontent.com/pchemguy/FFCVonWindows/refs/heads/main/AIFFCV/Screenshots/completion.jpg"
+cover_image: "https://raw.githubusercontent.com/pchemguy/FFCVonWindows/refs/heads/main/coverw.jpg"
 canonical_url: "https://github.com/pchemguy/FFCVonWindows"
 ---
 
