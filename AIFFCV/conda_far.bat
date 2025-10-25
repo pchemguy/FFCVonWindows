@@ -23,6 +23,8 @@
 ::
 ::      /preactivate  - Performs environment pre-initialization
 ::
+::      /nodeps       - skip library activation
+::
 ::      (no argument) - Activates full environment and launches FAR Manager
 ::                      (if detected) or opens a regular cmd.exe session.
 ::
@@ -51,10 +53,14 @@
 
 call :COLOR_SCHEME
 
+:: --- Parse arguments and preserve top-level context ---
+
+call :PARSE_ARGS %*
+
 echo:
 echo ==========================================================================
 echo %INFO% Setting up environment
-echo %INFO%
+echo %INFO% 
 echo %WARN% CLI: "%~f0" %*
 echo ==========================================================================
 echo:
@@ -74,7 +80,7 @@ set "MAMBA_BAT=%__CONDA_PREFIX%\condabin\mamba.bat"
 :: --- Make sure cmd.exe delayed expansion is enabled by default ---
 
 call :CHECK_DELAYED_EXPANSION
-if not "%ERRORLEVEL%"=="0" if not "%~1"=="" (
+if not "%ERRORLEVEL%"=="0" if defined _ARGS (
 
   rem -- Delayed Expansion is disabled, running in non-interactive mode ---
   
@@ -83,7 +89,7 @@ if not "%ERRORLEVEL%"=="0" if not "%~1"=="" (
   goto :CLEANUP
 ) else (
 
-  rem --- Delayed Expansion is disabled, running in interactive mode ---
+  rem --- Delayed Expansion is disabled, running in interactive mode {no arguments supplied} ---
   
   setlocal EnableDelayedExpansion EnableExtensions
 )
@@ -169,18 +175,22 @@ echo %OKOK% Conda activation succeeded.
 
 :: --- Activate dependencies ---
 
+if defined _ARG_NODEPS goto :NODEPS
+
 if not exist "%~dp0libs.bat" (
   echo %ERROR% Library activation script not found: "%~dp0libs.bat". Aborting...
   set "FINAL_EXIT_CODE=1"
   goto :CLEANUP
 )
-if /I "%~1"=="/preactivate" (
-  call "%~dp0libs.bat" /preactivate
-  set "EXIT_STATUS=!ERRORLEVEL!"
+
+if defined _ARG_PREACTIVATE (
+  set "_MODE=/preactivate"
 ) else (
-  call "%~dp0libs.bat" /activate
-  set "EXIT_STATUS=!ERRORLEVEL!"
+  set "_MODE=/activate"
 )
+
+call "%~dp0libs.bat" %_MODE%
+set "EXIT_STATUS=!ERRORLEVEL!"
 
 call :COLOR_SCHEME
 
@@ -194,11 +204,13 @@ if "%EXIT_STATUS%"=="0" (
   goto :CLEANUP
 )
 
+:NODEPS
+
 :: --- Use "/batch" to activate shell environment without starting FAR MANAGER ---
 
 set "FINAL_EXIT_CODE=0"
-if /I "%~1"=="/batch" goto :CLEANUP
-if /I "%~1"=="/preactivate" goto :CLEANUP
+if defined _ARG_BATCH goto :CLEANUP
+if defined _ARG_PREACTIVATE goto :CLEANUP
 
 :: --- Start FAR MANAGER ---
 
@@ -245,6 +257,43 @@ exit /b 0
 :: ============================================================================ COLOR_SCHEME END
 
 
+:: ============================================================================ PARSE_ARGS BEGIN
+:: ============================================================================
+:: --- Parse arguments ---
+:: Because "shift" destroys %0, original context is preserved by destroying this.
+
+:: --- Parsing arguments ---
+
+:PARSE_ARGS
+
+if not "%~1"=="" (
+  set "_ARGS=TRUE"
+) else (
+  set "_ARGS="
+  goto :PARSE_ARGS_DONE
+)
+
+set "_ARG_BATCH="
+set "_ARG_PREACTIVATE="
+set "_ARG_NODEPS="
+set "_MODE="
+
+:PARSE_NEXT_ARG
+
+if /I "%~1"=="" goto :PARSE_ARGS_DONE
+if /I "%~1"=="/batch"       set "_ARG_BATCH=1"
+if /I "%~1"=="/preactivate" set "_ARG_PREACTIVATE=1"
+if /I "%~1"=="/nodeps"      set "_ARG_NODEPS=1"
+shift
+goto :PARSE_NEXT_ARG
+
+:PARSE_ARGS_DONE
+
+exit /b 0
+:: ============================================================================ 
+:: ============================================================================ PARSE_ARGS END
+
+
 :: ============================================================================ CLEANUP BEGIN
 :: ============================================================================
 :: --- Clean up; prefer as the primary script exit point ---
@@ -252,6 +301,11 @@ exit /b 0
 
 :CLEANUP
 
+set "_ARGS="
+set "_ARG_BATCH="
+set "_ARG_PREACTIVATE="
+set "_ARG_NODEPS="
+set "_MODE="
 set  "INFO="
 set  "OKOK="
 set  "WARN="
@@ -371,10 +425,10 @@ echo:
 echo %WARN% Checking cmd.exe delayed expansion availability
 echo %INFO%
 echo %INFO% When running with any arguments, Delayed Expansion feature must be
-echo %INFO% enabled by the caller!
+echo %INFO% enabled by the caller.
 echo %INFO% When running withhout arguments, the script is supposed to spawn
 echo %INFO% an activated shell, so Delayed Expansion can be enabled locally.
-
+echo:
 if "!ComSpec!"=="%ComSpec%" (
   set "DELAYED_EXPANSION=1"
   echo %INFO% --------------------------
