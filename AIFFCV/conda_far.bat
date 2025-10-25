@@ -47,6 +47,10 @@
 ::      - Colorized output can be disabled by defining NOCOLOR=1.
 :: ============================================================================
 
+:: --- Escape sequence templates for color coded console output ---
+
+call :COLOR_SCHEME
+
 echo:
 echo ==========================================================================
 echo %INFO% Setting up environment
@@ -56,10 +60,6 @@ echo ==========================================================================
 echo:
 
 set "EXIT_STATUS=1"
-
-:: --- Escape sequence templates for color coded console output ---
-
-call :COLOR_SCHEME
 
 :: --- Default Conda Prefix ---
 
