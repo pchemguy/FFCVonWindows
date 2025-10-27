@@ -9,3 +9,5 @@ dependencies:
   - uv
   - pip
   - git
+  - hatch
+  - ruff
