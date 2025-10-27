@@ -44,6 +44,10 @@
 ::      - set "LINK=%_LIBNAME% %LINK%"
 :: =====================================================================
 
+:: --- Parse arguments and preserve top-level context ---
+
+call :PARSE_ARGS %*
+
 :: --- Escape sequence templates for color coded console output ---
 
 call :COLOR_SCHEME
@@ -85,20 +89,18 @@ set "PTH_PREFIX="
 set "TOTAL_ERRORS=0"
 set "EXIT_STATUS=1"
 
-:: --- Argument Parsing ---
+:: --- Execution Options ---
 
-set "_FORCE="
-set "_DO_INSTALL="
-
-:PARSE_ARGS
-
-if "%~1"=="" goto :PARSE_ARGS_DONE
-if /I "%~1"=="/f" set "_FORCE=1"
-if /I "%~1"=="/i" set "_DO_INSTALL=1"
-shift
-goto :PARSE_ARGS
-
-:PARSE_ARGS_DONE
+if defined _ARG_F (
+  set "_FORCE=1"
+) else (
+  set "_FORCE="
+)
+if defined _ARG_I (
+  set "_DO_INSTALL=1"
+) else (
+  set "_DO_INSTALL="
+)
 
 :: --- Route based on flags ---
 
@@ -277,6 +279,7 @@ goto :CLEANUP
 :: Color Scheme (with NOCOLOR fallback)
 :: ---------------------------------------------------------------------
 
+if defined _ARG_NOCOLOR set "NOCOLOR=1"
 if defined NOCOLOR (
   set  "INFO= [INFO]  "
   set  "OKOK= [-OK-]  "
@@ -292,6 +295,42 @@ if defined NOCOLOR (
 exit /b 0
 :: ============================================================================ 
 :: ============================================================================ COLOR_SCHEME END
+
+
+:: ============================================================================ PARSE_ARGS BEGIN
+:: ============================================================================
+:: --- Parse arguments ---
+:: Because "shift" destroys %0, original context is preserved by destroying this.
+
+:: --- Parsing arguments ---
+
+:PARSE_ARGS
+
+if not "%~1"=="" (
+  set "_ARGS=TRUE"
+) else (
+  set "_ARGS="
+  goto :PARSE_ARGS_DONE
+)
+
+set "_ARG_F="
+set "_ARG_I="
+set "_ARG_NOCOLOR="
+
+:PARSE_NEXT_ARG
+
+if /I "%~1"=="" goto :PARSE_ARGS_DONE
+if /I "%~1"=="/f"           set "_ARG_F=1"
+if /I "%~1"=="/i"           set "_ARG_I=1"
+if /I "%~1"=="/nocolor"     set "_ARG_NOCOLOR=1"
+shift
+goto :PARSE_NEXT_ARG
+
+:PARSE_ARGS_DONE
+
+exit /b 0
+:: ============================================================================ 
+:: ============================================================================ PARSE_ARGS END
 
 
 :: ============================================================================ CLEANUP BEGIN
@@ -317,6 +356,9 @@ set "_FORCE="
 set "_DO_INSTALL="
 set "EXIT_STATUS="
 set "TOTAL_ERRORS="
+
+set "_ARG_F="
+set "_ARG_I="
 
 :: --- Ensure a valid exit code is always returned ---
 

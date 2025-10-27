@@ -49,13 +49,13 @@
 ::      - Colorized output can be disabled by defining NOCOLOR=1.
 :: ============================================================================
 
-:: --- Escape sequence templates for color coded console output ---
-
-call :COLOR_SCHEME
-
 :: --- Parse arguments and preserve top-level context ---
 
 call :PARSE_ARGS %*
+
+:: --- Escape sequence templates for color coded console output ---
+
+call :COLOR_SCHEME
 
 echo:
 echo ==========================================================================
@@ -240,6 +240,7 @@ goto :CLEANUP
 :: Color Scheme (with NOCOLOR fallback)
 :: ---------------------------------------------------------------------
 
+if defined _ARG_NOCOLOR set "NOCOLOR=1"
 if defined NOCOLOR (
   set  "INFO= [INFO]  "
   set  "OKOK= [-OK-]  "
@@ -284,6 +285,7 @@ if /I "%~1"=="" goto :PARSE_ARGS_DONE
 if /I "%~1"=="/batch"       set "_ARG_BATCH=1"
 if /I "%~1"=="/preactivate" set "_ARG_PREACTIVATE=1"
 if /I "%~1"=="/nodeps"      set "_ARG_NODEPS=1"
+if /I "%~1"=="/nocolor"     set "_ARG_NOCOLOR=1"
 shift
 goto :PARSE_NEXT_ARG
 

@@ -66,6 +66,10 @@ echo:         ----- %DATE% %TIME% -----
 echo: CLI: "%~f0" %*
 echo:
 
+:: --- Parse arguments and preserve top-level context ---
+
+call :PARSE_ARGS %*
+
 :: --- Escape sequence templates for color coded console output ---
 
 call :COLOR_SCHEME
@@ -109,9 +113,11 @@ echo %INFO% Using bootstrap environment file "!YAML!".
 :: --------------------------------------------------------
 :: VERBOSITY
 :: --------------------------------------------------------
-set "VERBOSE="
-if /I "%~1"==""    set "VERBOSE=-v"
-if /I "%~1"=="/q"  set "VERBOSE="
+if not defined _ARG_Q (
+  set "VERBOSE=-v"
+) else (
+  set "VERBOSE="
+)
 
 :: --------------------------------------------------------
 :: Determine cache directory
@@ -169,6 +175,11 @@ call :ACTIVATE_ENV
 if not "%ERRORLEVEL%"=="0" (
   set "FINAL_EXIT_CODE=%ERRORLEVEL%"
   echo %ERROR% Failed to activate the new Python/Conda/Mamba/UV environment. Aborting...
+  goto :CLEANUP
+)
+if defined _ARG_INIT (
+  echo %INFO% Init-only flag supplied. Exiting...
+  set "FINAL_EXIT_CODE=0"
   goto :CLEANUP
 )
 
@@ -231,11 +242,50 @@ goto :CLEANUP
 :: ============================================================================
 
 
+:: ============================================================================ PARSE_ARGS BEGIN
+:: ============================================================================
+:: --- Parse arguments ---
+:: Because "shift" destroys %0, original context is preserved by destroying this.
+
+:: --- Parsing arguments ---
+
+:PARSE_ARGS
+
+if not "%~1"=="" (
+  set "_ARGS=TRUE"
+) else (
+  set "_ARGS="
+  goto :PARSE_ARGS_DONE
+)
+
+set "_ARG_INIT="
+set "_ARG_NOCOLOR="
+set "_ARG_Q="
+
+:PARSE_NEXT_ARG
+
+if /I "%~1"=="" goto :PARSE_ARGS_DONE
+if /I "%~1"=="/q"         set "_ARG_Q=1"
+if /I "%~1"=="/init"      set "_ARG_INIT=1"
+if /I "%~1"=="/nocolor"   set "_ARG_NOCOLOR=1"
+shift
+goto :PARSE_NEXT_ARG
+
+:PARSE_ARGS_DONE
+exit /b 0
+:: ============================================================================ 
+:: ============================================================================ PARSE_ARGS END
+
+
 :: ============================================================================ CLEANUP BEGIN
 :: ============================================================================
 :: --- Clean up; prefer as the primary script exit point ---
 :: To exit script, set FINAL_EXIT_CODE and goto CLEANUP
 :CLEANUP
+
+set "_ARG_INIT="
+set "_ARG_NOCOLOR="
+set "_ARG_Q="
 
 :: --- Ensure a valid exit code is always returned ---
 
@@ -252,6 +302,7 @@ exit /b %FINAL_EXIT_CODE%
 :: Color Scheme (with NOCOLOR fallback)
 :: ---------------------------------------------------------------------
 
+if defined _ARG_NOCOLOR set "NOCOLOR=1"
 if defined NOCOLOR (
   set  "INFO= [INFO]  "
   set  "OKOK= [-OK-]  "
