@@ -6,7 +6,7 @@ dependencies:
   - python=3.10
   - conda
   - mamba
-  - micromamba
+  - micromamba=2.3.0.*
   - uv
   - pip
   - git
