@@ -36,7 +36,6 @@ setlocal EnableDelayedExpansion EnableExtensions
 ::      - Honors the NOCOLOR variable to disable colorized output.
 ::      - Must be run from a clean cmd.exe shell (no preactivated Python/Conda).
 ::      - Automatically reuses cached downloads to minimize redundant fetches.
-::      - Creates a Python environment based on two YAML files:
 ::
 ::  Invocation Modes:
 ::      (no argument) - Verbose (-v)
