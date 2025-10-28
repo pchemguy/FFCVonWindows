@@ -153,7 +153,7 @@ call :COLOR_SCHEME
 call :MICROMAMBA_DOWNLOAD
 if not "%ERRORLEVEL%"=="0" (
   set "FINAL_EXIT_CODE=%ERRORLEVEL%"
-  echo %ERROR% Downloading micromamba. Aborting...
+  echo %ERROR% Failed to download/verify Micromamba. Aborting...
   goto :CLEANUP
 )
 
@@ -414,30 +414,37 @@ exit /b 0
 echo %WARN% Micromamba
 set "RELEASE_URL=https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64"
 set "MAMBA_EXE=%_CACHE%\micromamba\micromamba.exe"
+
+if exist "%MAMBA_EXE%" (
+  echo %INFO% Micromamba: Using cached "%MAMBA_EXE%"
+  goto :MICROMAMBA_DOWNLOAD_SKIP
+) 
+
 if not exist "%_CACHE%\micromamba" md "%_CACHE%\micromamba"
 set "EXIT_STATUS=!ERRORLEVEL!"
 if not "%EXIT_STATUS%"=="0" (
   echo %ERROR% Creating "%_CACHE%\micromamba". Aborting...
   exit /b %EXIT_STATUS%
 )
-if exist "%MAMBA_EXE%" (
-  echo %INFO% Micromamba: Using cached "%MAMBA_EXE%"
-) else (
-  echo %INFO% Micromamba: Downloading: %RELEASE_URL%
-  echo %INFO% Micromamba: Destination: %MAMBA_EXE%
-  curl --fail --retry 3 --retry-delay 2 -L -o "%MAMBA_EXE%" "%RELEASE_URL%"
-  set "EXIT_STATUS=!ERRORLEVEL!"
-  if not "!EXIT_STATUS!"=="0" (
-    echo %ERROR% Micromamba: Download failure. Aborting bootstrapping...
-    exit /b !EXIT_STATUS!
-  )
+
+echo %INFO% Micromamba: Downloading: %RELEASE_URL%
+echo %INFO% Micromamba: Destination: %MAMBA_EXE%
+curl --fail --retry 3 --retry-delay 2 -L -o "%MAMBA_EXE%" "%RELEASE_URL%"
+set "EXIT_STATUS=!ERRORLEVEL!"
+if not "!EXIT_STATUS!"=="0" (
+  echo %ERROR% Micromamba: Download failure. Aborting bootstrapping...
+  exit /b !EXIT_STATUS!
 )
+
 set "RELEASE_URL="
 if not exist "%MAMBA_EXE%" (
   echo %ERROR% Micromamba: File "%MAMBA_EXE%" missing after download. Aborting...
   exit /b 1
 )
 
+:MICROMAMBA_DOWNLOAD_SKIP
+
+echo %INFO% Micromamba: Basic test of "%MAMBA_EXE%": Attempt to query Micromamba version.
 "%MAMBA_EXE%" --version
 set "EXIT_STATUS=%ERRORLEVEL%"
 if not "%EXIT_STATUS%"=="0" (
