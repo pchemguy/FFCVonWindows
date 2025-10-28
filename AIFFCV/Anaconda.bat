@@ -437,6 +437,14 @@ if not exist "%MAMBA_EXE%" (
   echo %ERROR% Micromamba: File "%MAMBA_EXE%" missing after download. Aborting...
   exit /b 1
 )
+
+"%MAMBA_EXE%" --version
+set "EXIT_STATUS=%ERRORLEVEL%"
+if not "%EXIT_STATUS%"=="0" (
+  echo %ERROR% Failure to execute "%MAMBA_EXE%". ERRORLEVEL: "%EXIT_STATUS%". Aborting...
+  exit /b %EXIT_STATUS%
+)
+
 echo %OKOK% Micromamba: Completed
 echo:
 
